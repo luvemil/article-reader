@@ -1,3 +1,6 @@
+## I have some .html files in the same folder for testing purposes
+*.html
+
 *.gem
 *.rbc
 /.config
