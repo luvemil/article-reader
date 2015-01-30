@@ -1,22 +1,57 @@
 require 'nokogiri'
+require 'words_counted'
 
 module Parser
   # We start our search from the body tag
   ROOT_TAG = "body"
 
+  # Minimum words in a paragraph to call it text.
+  MIN_WORDS = 10
+
 
   def self.find_article root
     # An article is defined as the smallest tag containing all the text, with
-    # an appropriate definition of text. In this first example text is
-    # everything inside a <p> tag, so the article is the smallest tag
-    # containing all the <p> tags
-    nodes = root.css("p")
-    if nodes.size > 2
-      article = common_ancestor nodes[1], nodes[2]
-    else 
-      return nil
+    # an appropriate definition of text, as per the is_text method. 
+
+    # CASE: Document contains <article> tags
+    # If the page contains an <article> tag assume good faith and return
+    # simply that tag contents.
+    if root.css("article").size > 0
+      nodes = root.css("article")
+
+      # Returns the article node if there is just one and a NodeSet if there
+      # is more than one article tag.
+      if nodes.size == 1
+        return nodes[0]
+      else
+        return nodes
+      end
     end
+
+    # CASE: No <article> tag found
+    nodes = root.css("p")
+    node1 = nodes.pop
+    until is_text node1
+      node1 = nodes.pop
+    end
+    node2 = nodes.pop
+    until is_text node2
+      node2 = nodes.pop
+    end
+
+    article = common_ancestor node1, node2
     return article
+  end
+
+  def self.is_text node
+    # Return true if the node is identified as text.
+    # text is any <p> tag containing at least 10 words.
+    counter = WordsCounted.count(node.text)
+    if counter.word_count >= MIN_WORDS
+      return true
+    else
+      return false
+    end
   end
 
   def self.depth node
