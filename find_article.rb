@@ -15,21 +15,22 @@ module Parser
 
     # CASE: Document contains <article> tags
     # If the page contains an <article> tag assume good faith and return
-    # simply that tag contents.
+    # it verbatim.
     if root.css("article").size > 0
       nodes = root.css("article")
 
       # Returns the article node if there is just one and a NodeSet if there
       # is more than one article tag.
       if nodes.size == 1
-        return nodes[0]
+        return nodes[0] # => Nokogiri::XML::Node
       else
-        return nodes
+        return nodes # => Nokogiri::XML::NodeSet
       end
     end
 
     # CASE: No <article> tag found
     nodes = root.css("p")
+
     node1 = nodes.pop
     until is_text node1
       node1 = nodes.pop
@@ -40,7 +41,7 @@ module Parser
     end
 
     article = common_ancestor node1, node2
-    return article
+    return article # => Nokogiri::XML::Node
   end
 
   def self.is_text node
