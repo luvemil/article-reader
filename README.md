@@ -5,8 +5,8 @@ Extracts articles from html pages.
 ## Introduction
 
 The module is still in an early version. It tries to find the smallest tag
-containing the whole article. It works well with html pages with a structure
-similar to:
+containing the whole article. It works well with html pages whose structure
+is similar to:
 ```html
 <html>
 ...
@@ -20,8 +20,20 @@ similar to:
     </body>
 </html>
 ```
-It breaks if there are `<p>` tags outside the main article, but I plan to
-fix that in the future.
+or
+```html
+<html>
+...
+    <body>
+    ...
+        <article>
+        ...
+        </article>
+    </body>
+</html>
+```
+It breaks if there are `<p>` tags containing enough text outside the main
+article.
 
 ## Usage
 
@@ -31,11 +43,11 @@ If you want a one-liner call the `main` function:
 require './find-article.rb'
 
 html_file = <The name of the .html file>
-Parser.main html_file
+node = Parser.main html_file # => Nokogiri::XML::Node
 ```
 
 ## TODO
 
 * Be more selective with `<p>` tags.
-* Produce a well formatted html page containing the article
+* Produce a well formatted html page containing the article.
 
